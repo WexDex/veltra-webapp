@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git ls-tree *)"
+      "Bash(git ls-tree *)",
+      "Bash(npx create-next-app@latest . --typescript --tailwind --app --no-src-dir --no-eslint --import-alias \"@/*\" --yes)",
+      "Bash(del app\\\\page.tsx)",
+      "Bash(npx tsc *)",
+      "Bash(npm run *)"
     ]
   }
 }
