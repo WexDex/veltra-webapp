@@ -1,0 +1,89 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id         Int       @id @default(autoincrement())
+  name       String    @unique @db.VarChar(100)
+  created_at DateTime  @default(now()) @db.Timestamptz()
+  products   Product[]
+
+  @@map("categories")
+}
+
+model User {
+  id            Int          @id @default(autoincrement())
+  email         String       @unique @db.VarChar(255)
+  password_hash String
+  name          String       @db.VarChar(100)
+  created_at    DateTime     @default(now()) @db.Timestamptz()
+  sentMessages  Message[]    @relation("SentMessages")
+  recvMessages  Message[]    @relation("ReceivedMessages")
+  friendships   Friendship[] @relation("UserFriendships")
+  friends       Friendship[] @relation("FriendFriendships")
+
+  @@map("users")
+}
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(255)
+  description String?
+  image_url   String?
+  category_id Int
+  category    Category @relation(fields: [category_id], references: [id], onDelete: Cascade)
+  created_at  DateTime @default(now()) @db.Timestamptz()
+  updated_at  DateTime @default(now()) @db.Timestamptz()
+
+  @@map("products")
+}
+
+model Employee {
+  id         Int      @id @default(autoincrement())
+  name       String   @db.VarChar(100)
+  role       String   @db.VarChar(100)
+  phone      String?  @db.VarChar(50)
+  created_at DateTime @default(now()) @db.Timestamptz()
+
+  @@map("employees")
+}
+
+model Friendship {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  friend_id  Int
+  status     String   @default("pending") @db.VarChar(20)
+  created_at DateTime @default(now()) @db.Timestamptz()
+  user       User     @relation("UserFriendships", fields: [user_id], references: [id], onDelete: Cascade)
+  friend     User     @relation("FriendFriendships", fields: [friend_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, friend_id])
+  @@map("friendships")
+}
+
+model Message {
+  id          Int       @id @default(autoincrement())
+  sender_id   Int
+  receiver_id Int
+  content     String
+  created_at  DateTime  @default(now()) @db.Timestamptz()
+  read_at     DateTime? @db.Timestamptz()
+  sender      User      @relation("SentMessages", fields: [sender_id], references: [id], onDelete: Cascade)
+  receiver    User      @relation("ReceivedMessages", fields: [receiver_id], references: [id], onDelete: Cascade)
+
+  @@map("messages")
+}
+
+model Contact {
+  id         Int      @id @default(autoincrement())
+  name       String   @db.VarChar(100)
+  message    String
+  created_at DateTime @default(now()) @db.Timestamptz()
+
+  @@map("contacts")
+}
