@@ -1,16 +1,25 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { products } from "@/lib/mock-data";
 import Badge from "@/components/ui/Badge";
+import { DbProduct } from "@/lib/types";
+import { prisma } from "@/lib/db";
 
-export default async function ProductDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+async function getProduct(id: string): Promise<DbProduct | null> {
+  try {
+    const product = await prisma.product.findUnique({
+      where: { id: parseInt(id) },
+      include: { category: true },
+    });
+    return product as unknown as DbProduct | null;
+  } catch {
+    return null;
+  }
+}
+
+export default async function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const product = products.find((p) => p.id === id);
+  const product = await getProduct(id);
   if (!product) notFound();
 
   return (
@@ -30,13 +39,10 @@ export default async function ProductDetailPage({
       </Link>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-        <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-gray-900">
-          <Image
-            src={product.image_url}
-            alt={product.name}
-            fill
-            className="object-cover"
-          />
+        <div className="relative aspect-4/3 rounded-2xl overflow-hidden bg-gray-900">
+          {product.image_url && (
+            <Image src={product.image_url} alt={product.name} fill className="object-cover" />
+          )}
         </div>
 
         <div className="flex flex-col justify-center gap-6">
@@ -47,9 +53,7 @@ export default async function ProductDetailPage({
             <h1 className="text-3xl md:text-4xl font-bold text-gray-100 leading-tight mb-4">
               {product.name}
             </h1>
-            <p className="text-gray-400 leading-relaxed text-base">
-              {product.description}
-            </p>
+            <p className="text-gray-400 leading-relaxed text-base">{product.description}</p>
           </div>
 
           <div className="h-px bg-gray-800" />

@@ -1,29 +1,37 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
-import { Product, categories } from "@/lib/mock-data";
+import { DbCategory, DbProduct } from "@/lib/types";
 
 interface ProductFormProps {
-  product?: Partial<Product>;
-  onSubmit: (data: Partial<Product>) => void;
+  product?: Partial<DbProduct>;
+  onSubmit: (data: Partial<DbProduct>) => void;
   onCancel: () => void;
 }
 
-export default function ProductForm({
-  product,
-  onSubmit,
-  onCancel,
-}: ProductFormProps) {
+export default function ProductForm({ product, onSubmit, onCancel }: ProductFormProps) {
+  const [categories, setCategories] = useState<DbCategory[]>([]);
   const [form, setForm] = useState({
     name: product?.name ?? "",
     description: product?.description ?? "",
     image_url: product?.image_url ?? "",
-    category_id: product?.category_id ?? categories[0].id,
+    category_id: product?.category_id ?? 0,
   });
 
-  const set = (field: string, value: string) =>
+  useEffect(() => {
+    fetch("/api/categories")
+      .then((r) => r.json())
+      .then((data: DbCategory[]) => {
+        setCategories(data);
+        if (!product?.category_id && data.length > 0) {
+          setForm((prev) => ({ ...prev, category_id: data[0].id }));
+        }
+      });
+  }, [product?.category_id]);
+
+  const set = (field: string, value: string | number) =>
     setForm((prev) => ({ ...prev, [field]: value }));
 
   return (
@@ -49,7 +57,7 @@ export default function ProductForm({
         <select
           id="category"
           value={form.category_id}
-          onChange={(e) => set("category_id", e.target.value)}
+          onChange={(e) => set("category_id", parseInt(e.target.value))}
           className="w-full rounded-lg bg-gray-800 border border-gray-700 px-3.5 py-2.5 text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-700"
         >
           {categories.map((cat) => (
@@ -62,20 +70,17 @@ export default function ProductForm({
       <Input
         label="Image URL"
         id="image_url"
-        value={form.image_url}
+        value={form.image_url ?? ""}
         onChange={(e) => set("image_url", e.target.value)}
         placeholder="https://..."
       />
       <div className="flex flex-col gap-1.5">
-        <label
-          htmlFor="description"
-          className="text-sm font-medium text-gray-300"
-        >
+        <label htmlFor="description" className="text-sm font-medium text-gray-300">
           Description
         </label>
         <textarea
           id="description"
-          value={form.description}
+          value={form.description ?? ""}
           onChange={(e) => set("description", e.target.value)}
           rows={3}
           placeholder="Brief product description..."

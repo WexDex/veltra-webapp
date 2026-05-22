@@ -33,6 +33,15 @@ const NAV_ITEMS = [
       </svg>
     ),
   },
+  {
+    label: "Users",
+    href: "/admin/users",
+    icon: (
+      <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+        <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+      </svg>
+    ),
+  },
 ];
 
 export default function AdminSidebar() {
@@ -45,6 +54,20 @@ export default function AdminSidebar() {
         <span className="font-semibold text-gray-100 text-sm tracking-tight">
           Veltra Admin
         </span>
+      </div>
+
+      <div className="px-3 pt-3 pb-1">
+        <div className="flex items-center gap-0.5 rounded-lg bg-gray-800/60 border border-gray-700 p-0.5">
+          <Link
+            href="/"
+            className="flex-1 text-center px-3 py-1 rounded-md text-gray-400 hover:text-gray-200 text-xs font-semibold transition-colors"
+          >
+            User
+          </Link>
+          <span className="flex-1 text-center px-3 py-1 rounded-md bg-blue-700/25 text-blue-400 text-xs font-semibold">
+            Admin
+          </span>
+        </div>
       </div>
 
       <nav className="flex-1 px-3 py-4 flex flex-col gap-1">
@@ -65,21 +88,6 @@ export default function AdminSidebar() {
         ))}
       </nav>
 
-      <div className="px-3 pb-4">
-        <Link
-          href="/"
-          className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-500 hover:text-gray-300 hover:bg-gray-800/60 transition-colors"
-        >
-          <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
-            <path
-              fillRule="evenodd"
-              d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
-              clipRule="evenodd"
-            />
-          </svg>
-          Back to site
-        </Link>
-      </div>
     </aside>
   );
 }

@@ -1,14 +1,21 @@
-import { dashboardStats, recentContacts } from "@/lib/mock-data";
+import { DashboardStats } from "@/lib/types";
+import { prisma } from "@/lib/db";
 
-function StatCard({
-  label,
-  value,
-  icon,
-}: {
-  label: string;
-  value: number | string;
-  icon: React.ReactNode;
-}) {
+async function getStats(): Promise<DashboardStats> {
+  try {
+    const [totalProducts, totalEmployees, totalUsers, recentContacts] = await Promise.all([
+      prisma.product.count(),
+      prisma.employee.count(),
+      prisma.user.count(),
+      prisma.contact.findMany({ orderBy: { created_at: "desc" }, take: 5 }),
+    ]);
+    return { totalProducts, totalEmployees, totalUsers, recentContacts: recentContacts as DashboardStats["recentContacts"] };
+  } catch {
+    return { totalProducts: 0, totalEmployees: 0, totalUsers: 0, recentContacts: [] };
+  }
+}
+
+function StatCard({ label, value, icon }: { label: string; value: number; icon: React.ReactNode }) {
   return (
     <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
       <div className="flex items-center justify-between mb-4">
@@ -22,7 +29,9 @@ function StatCard({
   );
 }
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const stats = await getStats();
+
   return (
     <div className="p-8">
       <div className="mb-8">
@@ -33,7 +42,7 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-10">
         <StatCard
           label="Total Products"
-          value={dashboardStats.totalProducts}
+          value={stats.totalProducts}
           icon={
             <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
               <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
@@ -42,7 +51,7 @@ export default function DashboardPage() {
         />
         <StatCard
           label="Total Employees"
-          value={dashboardStats.totalEmployees}
+          value={stats.totalEmployees}
           icon={
             <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
               <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
@@ -51,47 +60,30 @@ export default function DashboardPage() {
         />
         <StatCard
           label="Registered Users"
-          value={dashboardStats.totalUsers}
+          value={stats.totalUsers}
           icon={
             <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
-              <path
-                fillRule="evenodd"
-                d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                clipRule="evenodd"
-              />
+              <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
             </svg>
           }
         />
       </div>
 
       <div>
-        <h2 className="text-lg font-semibold text-gray-100 mb-4">
-          Recent Contact Submissions
-        </h2>
+        <h2 className="text-lg font-semibold text-gray-100 mb-4">Recent Contact Submissions</h2>
         <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-800">
-                <th className="text-left px-5 py-3.5 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Name
-                </th>
-                <th className="text-left px-5 py-3.5 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Message
-                </th>
-                <th className="text-left px-5 py-3.5 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Date
-                </th>
+                <th className="text-left px-5 py-3.5 text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                <th className="text-left px-5 py-3.5 text-xs font-medium text-gray-500 uppercase tracking-wider">Message</th>
+                <th className="text-left px-5 py-3.5 text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
               </tr>
             </thead>
             <tbody>
-              {recentContacts.map((contact) => (
-                <tr
-                  key={contact.id}
-                  className="border-b border-gray-800 last:border-0 hover:bg-gray-800/30 transition-colors"
-                >
-                  <td className="px-5 py-3.5 text-gray-100 text-sm font-medium whitespace-nowrap">
-                    {contact.name}
-                  </td>
+              {stats.recentContacts.map((contact) => (
+                <tr key={contact.id} className="border-b border-gray-800 last:border-0 hover:bg-gray-800/30 transition-colors">
+                  <td className="px-5 py-3.5 text-gray-100 text-sm font-medium whitespace-nowrap">{contact.name}</td>
                   <td className="px-5 py-3.5 text-gray-400 text-sm max-w-xs">
                     <p className="truncate">{contact.message}</p>
                   </td>

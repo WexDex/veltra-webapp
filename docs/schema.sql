@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS users (
   email          VARCHAR(255) NOT NULL UNIQUE,
   password_hash  TEXT         NOT NULL,
   name           VARCHAR(100) NOT NULL,
+  role           VARCHAR(20)  NOT NULL DEFAULT 'user' CHECK (role IN ('user', 'admin')),
   created_at     TIMESTAMPTZ  NOT NULL DEFAULT NOW()
 );
 
@@ -81,4 +82,17 @@ CREATE TABLE IF NOT EXISTS contacts (
   name        VARCHAR(100) NOT NULL,
   message     TEXT         NOT NULL,
   created_at  TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+);
+
+-- ─────────────────────────────────────────────
+-- notifications
+-- ─────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS notifications (
+  id           SERIAL      PRIMARY KEY,
+  user_id      INTEGER     NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  type         VARCHAR(50) NOT NULL,
+  from_user_id INTEGER     REFERENCES users(id) ON DELETE SET NULL,
+  ref_id       INTEGER,
+  read         BOOLEAN     NOT NULL DEFAULT FALSE,
+  created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

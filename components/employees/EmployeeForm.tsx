@@ -3,19 +3,15 @@
 import { useState } from "react";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
-import { Employee } from "@/lib/mock-data";
+import { DbEmployee } from "@/lib/types";
 
 interface EmployeeFormProps {
-  employee?: Partial<Employee>;
-  onSubmit: (data: Partial<Employee>) => void;
+  employee?: Partial<DbEmployee>;
+  onSubmit: (data: Partial<DbEmployee>) => void;
   onCancel: () => void;
 }
 
-export default function EmployeeForm({
-  employee,
-  onSubmit,
-  onCancel,
-}: EmployeeFormProps) {
+export default function EmployeeForm({ employee, onSubmit, onCancel }: EmployeeFormProps) {
   const [form, setForm] = useState({
     name: employee?.name ?? "",
     role: employee?.role ?? "",
@@ -52,14 +48,12 @@ export default function EmployeeForm({
       <Input
         label="Phone Number"
         id="phone"
-        value={form.phone}
+        value={form.phone ?? ""}
         onChange={(e) => set("phone", e.target.value)}
         placeholder="+1 (555) 000-0000"
       />
       <div className="flex justify-end gap-3 pt-2">
-        <Button type="button" variant="ghost" onClick={onCancel}>
-          Cancel
-        </Button>
+        <Button type="button" variant="ghost" onClick={onCancel}>Cancel</Button>
         <Button type="submit">Save Employee</Button>
       </div>
     </form>

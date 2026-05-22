@@ -1,9 +1,25 @@
 import Link from "next/link";
-import { FEATURED_PRODUCTS } from "@/lib/mock-data";
 import ProductCard from "@/components/products/ProductCard";
 import VeltraLogo from "@/components/ui/VeltraLogo";
+import { DbProduct } from "@/lib/types";
+import { prisma } from "@/lib/db";
 
-export default function HomePage() {
+async function getFeaturedProducts(): Promise<DbProduct[]> {
+  try {
+    const products = await prisma.product.findMany({
+      include: { category: true },
+      orderBy: { created_at: "desc" },
+      take: 3,
+    });
+    return products as unknown as DbProduct[];
+  } catch {
+    return [];
+  }
+}
+
+export default async function HomePage() {
+  const featured = await getFeaturedProducts();
+
   return (
     <>
       {/* Hero */}
@@ -16,9 +32,7 @@ export default function HomePage() {
         </h1>
         <p className="text-lg md:text-xl text-gray-400 mb-10 max-w-xl leading-relaxed">
           Discover what we make.{" "}
-          <span className="text-gray-300">
-            Built for the people who care.
-          </span>
+          <span className="text-gray-300">Built for the people who care.</span>
         </p>
         <div className="flex flex-col sm:flex-row items-center gap-4">
           <Link
@@ -40,9 +54,7 @@ export default function HomePage() {
       <section className="px-6 pb-32 max-w-7xl mx-auto w-full">
         <div className="flex items-center justify-between mb-10">
           <div>
-            <h2 className="text-2xl font-bold text-gray-100">
-              Featured Products
-            </h2>
+            <h2 className="text-2xl font-bold text-gray-100">Featured Products</h2>
             <p className="text-gray-400 text-sm mt-1">Our most popular picks</p>
           </div>
           <Link
@@ -53,7 +65,7 @@ export default function HomePage() {
           </Link>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {FEATURED_PRODUCTS.map((product) => (
+          {featured.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>

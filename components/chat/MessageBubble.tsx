@@ -1,7 +1,7 @@
-import { Message } from "@/lib/mock-data";
+import { DbMessage } from "@/lib/types";
 
 interface MessageBubbleProps {
-  message: Message;
+  message: DbMessage;
   isOwn: boolean;
 }
 

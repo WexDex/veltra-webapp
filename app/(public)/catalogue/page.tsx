@@ -1,14 +1,21 @@
 "use client";
 
-import { useState } from "react";
-import { products, categories } from "@/lib/mock-data";
+import { useState, useEffect } from "react";
 import ProductCard from "@/components/products/ProductCard";
 import Input from "@/components/ui/Input";
 import { cn } from "@/lib/utils";
+import { DbProduct, DbCategory } from "@/lib/types";
 
 export default function CataloguePage() {
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [products, setProducts] = useState<DbProduct[]>([]);
+  const [categories, setCategories] = useState<DbCategory[]>([]);
+  const [activeCategory, setActiveCategory] = useState<number | null>(null);
   const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    fetch("/api/products").then((r) => r.json()).then(setProducts);
+    fetch("/api/categories").then((r) => r.json()).then(setCategories);
+  }, []);
 
   const filtered = products.filter((p) => {
     const matchCat = !activeCategory || p.category_id === activeCategory;
@@ -19,9 +26,7 @@ export default function CataloguePage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
       <div className="mb-10">
-        <h1 className="text-3xl font-bold text-gray-100 mb-2">
-          Product Catalogue
-        </h1>
+        <h1 className="text-3xl font-bold text-gray-100 mb-2">Product Catalogue</h1>
         <p className="text-gray-400">Browse our full range of products.</p>
       </div>
 
@@ -38,9 +43,7 @@ export default function CataloguePage() {
             onClick={() => setActiveCategory(null)}
             className={cn(
               "px-3.5 py-1.5 rounded-full text-sm font-medium transition-colors cursor-pointer",
-              !activeCategory
-                ? "bg-blue-700 text-white"
-                : "bg-gray-800 text-gray-400 hover:text-gray-100"
+              !activeCategory ? "bg-blue-700 text-white" : "bg-gray-800 text-gray-400 hover:text-gray-100"
             )}
           >
             All
@@ -51,9 +54,7 @@ export default function CataloguePage() {
               onClick={() => setActiveCategory(cat.id)}
               className={cn(
                 "px-3.5 py-1.5 rounded-full text-sm font-medium transition-colors cursor-pointer",
-                activeCategory === cat.id
-                  ? "bg-blue-700 text-white"
-                  : "bg-gray-800 text-gray-400 hover:text-gray-100"
+                activeCategory === cat.id ? "bg-blue-700 text-white" : "bg-gray-800 text-gray-400 hover:text-gray-100"
               )}
             >
               {cat.name}

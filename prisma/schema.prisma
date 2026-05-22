@@ -17,15 +17,18 @@ model Category {
 }
 
 model User {
-  id            Int          @id @default(autoincrement())
-  email         String       @unique @db.VarChar(255)
-  password_hash String
-  name          String       @db.VarChar(100)
-  created_at    DateTime     @default(now()) @db.Timestamptz()
-  sentMessages  Message[]    @relation("SentMessages")
-  recvMessages  Message[]    @relation("ReceivedMessages")
-  friendships   Friendship[] @relation("UserFriendships")
-  friends       Friendship[] @relation("FriendFriendships")
+  id                    Int            @id @default(autoincrement())
+  email                 String         @unique @db.VarChar(255)
+  password_hash         String
+  name                  String         @db.VarChar(100)
+  role                  String         @default("user") @db.VarChar(20)
+  created_at            DateTime       @default(now()) @db.Timestamptz()
+  sentMessages          Message[]      @relation("SentMessages")
+  recvMessages          Message[]      @relation("ReceivedMessages")
+  friendships           Friendship[]   @relation("UserFriendships")
+  friends               Friendship[]   @relation("FriendFriendships")
+  receivedNotifications Notification[] @relation("ReceivedNotifications")
+  sentNotifications     Notification[] @relation("SentNotifications")
 
   @@map("users")
 }
@@ -86,4 +89,18 @@ model Contact {
   created_at DateTime @default(now()) @db.Timestamptz()
 
   @@map("contacts")
+}
+
+model Notification {
+  id           Int      @id @default(autoincrement())
+  user_id      Int
+  type         String   @db.VarChar(50)
+  from_user_id Int?
+  ref_id       Int?
+  read         Boolean  @default(false)
+  created_at   DateTime @default(now()) @db.Timestamptz()
+  user         User     @relation("ReceivedNotifications", fields: [user_id], references: [id], onDelete: Cascade)
+  fromUser     User?    @relation("SentNotifications", fields: [from_user_id], references: [id], onDelete: SetNull)
+
+  @@map("notifications")
 }

@@ -13,7 +13,17 @@
       "PowerShell(Get-ChildItem -Path \"e:\\\\Projects\\\\veltra-webapp\\\\node_modules\\\\next\\\\dist\\\\docs\\\\01-app\" -Recurse | Where-Object {$_.PSIsContainer -eq $false} | Select-Object Name | Head -30)",
       "PowerShell(Get-ChildItem -Path \"e:\\\\Projects\\\\veltra-webapp\\\\node_modules\\\\next\\\\dist\\\\docs\\\\01-app\" -Recurse | Where-Object {$_.PSIsContainer -eq $false} | Select-Object Name | Select-Object -First 30)",
       "Bash(findstr /I \"^\")",
-      "PowerShell(Get-ChildItem \"e:\\\\Projects\\\\veltra-webapp\\\\node_modules\\\\next\\\\dist\\\\docs\\\\01-app\\\\02-guides\" | Where-Object {$_.PSIsContainer} | Select-Object Name)"
+      "PowerShell(Get-ChildItem \"e:\\\\Projects\\\\veltra-webapp\\\\node_modules\\\\next\\\\dist\\\\docs\\\\01-app\\\\02-guides\" | Where-Object {$_.PSIsContainer} | Select-Object Name)",
+      "Bash(Test-Path \"e:\\\\Projects\\\\veltra-webapp\\\\app\\\\\\(admin\\)\\\\admin\\\\users\" -PathType Container)",
+      "Bash(tasklist)",
+      "Bash(findstr node *)",
+      "Bash(mkdir -p \"e:\\\\Projects\\\\veltra-webapp\\\\app\\\\api\\\\friendships\\\\[id]\" \"e:\\\\Projects\\\\veltra-webapp\\\\app\\\\api\\\\notifications\\\\read\" \"e:\\\\Projects\\\\veltra-webapp\\\\app\\\\api\\\\admin\\\\users\\\\[id]\" 2>&1; echo \"done\")",
+      "Bash(New-Item -ItemType Directory -Force \"e:\\\\Projects\\\\veltra-webapp\\\\app\\\\api\\\\messages\\\\conversations\")",
+      "Bash(Out-Null)",
+      "Bash(Write-Host \"done\")"
+    ],
+    "additionalDirectories": [
+      "e:\\Projects\\veltra-webapp\\app\\api\\friendships"
     ]
   }
 }
